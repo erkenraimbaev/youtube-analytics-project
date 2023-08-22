@@ -26,6 +26,61 @@ class Channel:
         # Количество видео на канале
         self.__videoCount = int(channel.get('items')[0].get('statistics').get('videoCount'))
 
+    def __str__(self):
+        """
+        Магический метод, отображает удобочитаемую строку для пользователя
+        """
+        return f"{self.title} ({self.url})"
+
+    def __add__(self, other):
+        """
+        Метод срабатывает, когда используется оператор сложения.
+        В параметре other хранится то, что справа от знака +
+        """
+        return self.subscriber_count + other.subscriber_count
+
+    def __sub__(self, other):
+        """
+        Метод срабатывает, когда используется оператор сложения.
+        В параметре other хранится то, что справа от знака +
+        """
+        return self.subscriber_count - other.subscriber_count
+
+    def __gt__(self, other):
+        """
+        Метод срабатывает, когда используется оператор >.
+        В параметре other хранится то, что справа от знака +
+        """
+        return self.subscriber_count > other.subscriber_count
+
+    def __ge__(self, other):
+        """
+        Метод срабатывает, когда используется оператор >=.
+        В параметре other хранится то, что справа от знака +
+        """
+        return self.subscriber_count >= other.subscriber_count
+
+    def __lt__(self, other):
+        """
+        Метод срабатывает, когда используется оператор <.
+        В параметре other хранится то, что справа от знака +
+        """
+        return self.subscriber_count < other.subscriber_count
+
+    def __le__(self, other):
+        """
+        Метод срабатывает, когда используется оператор <=.
+        В параметре other хранится то, что справа от знака +
+        """
+        return self.subscriber_count <= other.subscriber_count
+
+    def __eq__(self, other):
+        """
+        Метод срабатывает, когда используется оператор ==.
+        В параметре other хранится то, что справа от знака +
+        """
+        return self.subscriber_count == other.subscriber_count
+
     @property
     def channel_id(self):
         return self.__channel_id
@@ -60,8 +115,6 @@ class Channel:
 
     def print_info(self):
         """Выводит в консоль информацию о канале."""
-        # api_key = os.environ.get('YOUTUBE_API')
-        # youtube = build('youtube', 'v3', developerKey=api_key)
         channel = Channel.youtube_object.channels().list(id=self.channel_id, part='snippet,statistics').execute()
         return print(channel)
 
