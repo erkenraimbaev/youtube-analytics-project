@@ -14,16 +14,47 @@ class Video:
         view_count = количество просмотров
         like_count = количество лайков
         """
+
         self.__video_id = video_id
+        self.__video_title = None
+        self.__view_count = None
+        self.__url = None
+        self.__like_count = None
+        self.load_data_from_api()
+
+    @classmethod
+    def get_service(cls):
+        """
+        Этот метод создает и возвращает ютуб объект для дальнейшей работы
+        """
+        if cls.youtube_obj:
+            return cls.youtube_obj
+
         api_key = os.environ.get('YOUTUBE_API')
-        Video.youtube_obj = build('youtube', 'v3', developerKey=api_key)
-        video_response = Video.youtube_obj.videos().list(part='snippet,statistics,contentDetails,topicDetails',
-                                                         id=self.__video_id
-                                                         ).execute()
-        self.__video_title: str = video_response['items'][0]['snippet']['title']
-        self.__url: str = 'https://www.youtube.com/channel/' + self.__video_id
-        self.__view_count: int = video_response['items'][0]['statistics']['viewCount']
-        self.__like_count: int = video_response['items'][0]['statistics']['likeCount']
+        cls.youtube_obj = build('youtube', 'v3', developerKey=api_key)
+        return cls.youtube_obj
+
+    def load_data_from_api(self):
+        """
+        Метод, который создает и возвращает данные по ютуб видео (объекту) и формирует
+        атрибуты объекта
+        """
+        data = self.get_service().videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                                id=self.__video_id
+                                                ).execute()
+        try:
+        # Пытаемся при правильном video id присвоить значение других атрибутов объекта
+            if data['items']:
+                self.__video_title: str = data['items'][0]['snippet']['title']
+                self.__url: str = 'https://www.youtube.com/channel/' + self.__video_id
+                self.__view_count: int = data['items'][0]['statistics']['viewCount']
+                self.__like_count: int = data['items'][0]['statistics']['likeCount']
+        except (IndexError, KeyError):
+        # Исключения
+            self.__video_title = None
+            self.__url = None
+            self.__view_count = None
+            self.__like_count = None
 
     @property
     def youtube_object(self):
